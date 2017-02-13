@@ -142,6 +142,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="lib\mesh_library\Geometry\Point.h" />
+    <ClInclude Include="lib\mesh_library\Geometry\Point2.H" />
+    <ClInclude Include="lib\mesh_library\Mesh\Boundary.h" />
+    <ClInclude Include="lib\mesh_library\Mesh\Edge.h" />
+    <ClInclude Include="lib\mesh_library\Mesh\Face.h" />
+    <ClInclude Include="lib\mesh_library\Mesh\HalfEdge.h" />
+    <ClInclude Include="lib\mesh_library\Mesh\iterators.h" />
+    <ClInclude Include="lib\mesh_library\Mesh\mesh.h" />
+    <ClInclude Include="lib\mesh_library\Mesh\Vertex.h" />
+    <ClInclude Include="lib\mesh_library\Parser\parser.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lib\mesh_library\Mesh\Boundary.cpp" />
+    <ClCompile Include="lib\mesh_library\Mesh\Edge.cpp" />
+    <ClCompile Include="lib\mesh_library\Mesh\HalfEdge.cpp" />
+    <ClCompile Include="lib\mesh_library\Mesh\Mesh.cpp" />
+    <ClCompile Include="lib\mesh_library\Mesh\Vertex.cpp" />
+    <ClCompile Include="lib\mesh_library\Parser\token.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
