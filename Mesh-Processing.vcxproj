@@ -160,6 +160,7 @@
     <ClCompile Include="lib\mesh_library\Mesh\Mesh.cpp" />
     <ClCompile Include="lib\mesh_library\Mesh\Vertex.cpp" />
     <ClCompile Include="lib\mesh_library\Parser\token.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
