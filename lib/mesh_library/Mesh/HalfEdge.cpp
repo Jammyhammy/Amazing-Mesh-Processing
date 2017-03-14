@@ -1,4 +1,4 @@
-#include "HalfEdge.h"
+   #include "HalfEdge.h"
 
 using namespace MeshLib;
 

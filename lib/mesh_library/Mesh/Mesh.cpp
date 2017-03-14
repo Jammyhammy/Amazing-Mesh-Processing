@@ -4,8 +4,10 @@
 #include "Face.h"
 #include "Mesh.h"
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <cstring>
+#include <vector>
 
 using namespace MeshLib;
 
@@ -67,6 +69,7 @@ bool CMesh::isBoundary(CMesh::tHalfEdge  he)
     return false;
 };
 
+//number of vertex, edge, face
 int CMesh::numVertices()
 {
     return (int) m_verts.size();
@@ -80,6 +83,36 @@ int CMesh::numEdges()
 int CMesh::numFaces()
 {
     return (int) m_faces.size();
+};
+
+//max ids
+int CMesh::max_vertex_id()
+{
+	int max_id = 0;
+	for (std::list<CVertex*>::iterator viter = m_verts.begin(); viter != m_verts.end(); viter++)
+	{
+		CVertex* pV = *viter;
+		if (pV->id() > max_id)
+		{
+			max_id = pV->id();
+		}
+	}
+	return max_id;
+
+};
+
+int CMesh::max_face_id()
+{
+	int max_id = 0;
+	for (std::list<CFace*>::iterator fiter = m_faces.begin(); fiter != m_faces.end(); fiter++)
+	{
+		CFace* pF = *fiter;
+		if (pF->id() > max_id)
+		{
+			max_id = pF->id();
+		}
+	}
+	return max_id;
 };
 
 
@@ -162,7 +195,6 @@ CMesh::tHalfEdge CMesh::faceMostClwHalfEdge(CMesh::tFace  face)
 CMesh::~CMesh()
 {
     //remove vertices
-
     for(std::list<CVertex*>::iterator viter = m_verts.begin(); viter != m_verts.end(); viter ++)
     {
         CVertex* pV = *viter;
@@ -977,14 +1009,14 @@ CMesh::tFace CMesh::createFace(CVertex* v[] , int id)
     //connecting with edge
     for(int i = 0; i < 3; i ++)
     {
-        tEdge e = createEdge(v[i], v[(i+2)%3]);
+		tEdge e = createEdge(v[i], v[(i + 2) % 3]);
         if(e->halfedge(0)  == NULL)
         {
             e->halfedge(0) = hes[i];
         }
         else
         {
-            assert(e->halfedge(1) == NULL);
+            //assert(e->halfedge(1) == NULL);
             e->halfedge(1) = hes[i];
         }
         hes[i]->edge() = e;
@@ -1012,7 +1044,7 @@ CMesh::tFace CMesh::idFace(int id)
     return m_map_face[id];
 };
 
-//acess f->id
+//access f->id
 int CMesh::faceId(CMesh::tFace  f)
 {
     return f->id();
@@ -1170,7 +1202,7 @@ void CMesh::read_m(const char* input)
             continue;
         }
 
-        //read in edge attributes
+        //read in corner attributes
         if(strcmp(str,"Corner")==0)
         {
             str = strtok(NULL," \r\n");
@@ -1198,7 +1230,7 @@ void CMesh::read_m(const char* input)
         }
     }
 
-    //Label boundary edges
+    //update boundary edges
     for(std::list<CEdge*>::iterator eiter= m_edges.begin() ; eiter != m_edges.end() ; ++ eiter)
     {
         CMesh::tEdge     edge = *eiter;
@@ -1274,10 +1306,11 @@ void CMesh::write_m(const char* output)
     assert(_os);
 
     //remove vertices
+	//int Vid = 0;
     for(std::list<CVertex*>::iterator viter = m_verts.begin(); viter != m_verts.end(); viter ++)
     {
         tVertex v = *viter;
-
+		//v->set_id(++Vid);
         fprintf(_os,"Vertex %d ", v->id());
 
         for(int i = 0; i < 3; i ++)
@@ -1291,9 +1324,12 @@ void CMesh::write_m(const char* output)
         fprintf(_os,"\n");
     }
 
+	//int Fid = 0;
     for(std::list<CFace*>::iterator fiter = m_faces.begin(); fiter != m_faces.end(); fiter ++)
     {
         tFace f = *fiter;
+		//f->set_id(++Fid);
+		
         fprintf(_os,"Face %d",f->id());
 
         tHalfEdge he = f->halfedge();

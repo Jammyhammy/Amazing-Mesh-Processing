@@ -16,6 +16,7 @@ class CFace
 
         CFace() {
             m_halfedge = NULL;
+			m_alive = true;
         };
         ~CFace() {};
 
@@ -25,6 +26,9 @@ class CFace
         int&                  id()          {
             return m_id;
         };
+		bool &	status() {
+			return m_alive;
+		};
         const int           id() const {
             return m_id;
         };
@@ -32,10 +36,14 @@ class CFace
             return m_string;
         };
         
+		void set_id(int id){
+			m_id = id;
+		}
 
     private:
         int                       m_id;
         CHalfEdge*     m_halfedge;
+		bool m_alive;
         std::string        m_string;
         
 };

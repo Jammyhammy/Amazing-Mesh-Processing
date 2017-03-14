@@ -1,7 +1,7 @@
 #ifndef  _ITERATORS_H_
 #define  _ITERATORS_H_
 
-#include "Mesh.h"
+#include "../Mesh/Mesh.h"
 
 namespace MeshLib {
 

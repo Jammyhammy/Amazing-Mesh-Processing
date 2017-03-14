@@ -18,19 +18,30 @@ class CEdge
         CEdge() {
             m_halfedge[0] = NULL;
             m_halfedge[1] = NULL;
+			m_alive = true;
         };
         ~CEdge() {};
-
+		
+		//get a half edge
         CHalfEdge*& halfedge(int i) {
             assert(0<=i && i < 2);
             return m_halfedge[i];
         };
+
+		//check if an edge is a boundary edge or not
         bool         boundary() {
             return (m_halfedge[0] == NULL && m_halfedge[1] != NULL) || (m_halfedge[0] != NULL && m_halfedge[1] == NULL);
         };
+
+		bool & status() {
+			return m_alive;
+		};
+
+		//get the other half edge
         CHalfEdge*& other(CHalfEdge* he) {
             return (he != m_halfedge[0])?m_halfedge[0]:m_halfedge[1];
         };
+
         std::string& string() {
             return m_string;
         };
@@ -39,6 +50,7 @@ class CEdge
     private:
 
         CHalfEdge*   m_halfedge[2];
+		bool m_alive;
         std::string      m_string;
         
 };

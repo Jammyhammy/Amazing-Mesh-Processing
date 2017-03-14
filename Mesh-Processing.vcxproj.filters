@@ -45,6 +45,9 @@
     <ClInclude Include="lib\mesh_library\Parser\parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="helper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\mesh_library\Mesh\Boundary.cpp">
@@ -66,6 +69,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Subdivision.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="helper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FillHole.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

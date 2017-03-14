@@ -17,6 +17,7 @@ class CVertex
         CVertex() {
             m_halfedge = NULL;
             m_boundary = false;
+			m_alive = true;
         };
         ~CVertex() {};
 
@@ -29,7 +30,9 @@ class CVertex
         CPoint2& uv()       {
             return m_uv;
         };
-
+		CPoint& point_updated(){
+			return m_point_update;
+		};
         CHalfEdge* most_ccw_out_halfedge();
         CHalfEdge* most_clw_out_halfedge();
         CHalfEdge* most_ccw_in_halfedge();
@@ -38,6 +41,7 @@ class CVertex
         CHalfEdge*& halfedge() {
             return m_halfedge;
         };
+
         std::string& string() {
             return m_string;
         };
@@ -48,6 +52,38 @@ class CVertex
         bool& boundary() {
             return m_boundary;
         };
+		bool& status() {
+			return m_alive;
+		};
+
+		void set_id(int id){
+			m_id = id;
+		}
+
+		void set_point(CPoint p)
+		{
+			m_point = p;
+		}
+
+		void set_point_update(CPoint update)
+		{
+			m_point_update = update;
+		}
+
+		//how many edges a vertex is shared with
+		int num_neighbors()
+		{
+
+		}
+		bool operator<(const CVertex& m_vertex)
+		{
+			return (m_vertex.m_id < m_id);
+		}
+		bool operator==(const CVertex& m_vertex)
+		{
+			return (m_vertex.m_id == m_id);
+		}
+		
 
 
     private:
@@ -55,10 +91,12 @@ class CVertex
 
         CPoint m_point;
         CPoint m_normal;
+		CPoint m_point_update;
         CPoint2 m_uv;
 
         CHalfEdge* m_halfedge;
         bool              m_boundary;
+		bool		m_alive;
         std::string     m_string;
       
 

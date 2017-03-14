@@ -82,6 +82,19 @@ class CPoint {
             return r;
         };
 
+		bool operator==(const CPoint& uv)
+		{
+			return (v[0] == uv.v[0] && v[1] == uv.v[1] && v[2] == uv.v[2]);
+		}
+
+		bool operator!=(const CPoint& uv)
+		{
+			if (v[0] == uv.v[0] && v[1] == uv.v[1] && v[2] == uv.v[2])
+				return false;
+			else
+				return true;
+		}
+
 		//dot product
 		double   operator*(const CPoint& p) const
         {
@@ -103,6 +116,28 @@ class CPoint {
             CPoint p(-v[0],-v[1],-v[2]);
             return p;
         };
+
+		void set_x(double x) {
+			v[0] = x;
+		}
+		void set_y(double y) {
+			v[1] = y;
+		}
+		void set_z(double z) {
+			v[2] = z;
+		}
+
+        double get_x() {
+			return v[0];
+		}
+		double get_y() {
+			return v[1];
+		}
+		double get_z() {
+			return v[2];
+		}
+
+
     protected:
         double v[3];
 };

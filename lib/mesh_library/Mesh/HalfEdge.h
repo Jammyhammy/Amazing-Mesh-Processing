@@ -4,7 +4,7 @@
 #include  <assert.h>
 #include <cmath>
 #include <string>
-#include "Edge.h"
+#include "../Mesh/Edge.h"
 
 
 namespace MeshLib {
@@ -23,8 +23,11 @@ class CHalfEdge
             m_prev = NULL;
             m_next = NULL;
             m_face = NULL;
+			m_alive = true;
+            m_updated = false;
         };
-        ~CHalfEdge() {};
+
+        ~CHalfEdge() { };
 
         CEdge*&            edge()    {
             return m_edge;
@@ -48,9 +51,22 @@ class CHalfEdge
         CHalfEdge*& he_sym()  {
             return m_edge->other(this);
         };
+
         CFace*&      face()    {
             return m_face;
         };
+
+		bool &	status() {
+			return m_alive;
+		};
+
+		bool &	updated() {
+			return m_updated;
+		};
+
+        void set_updated(bool updated) {
+            m_updated = updated;
+        }
 
         CHalfEdge*    ccw_rotate_about_target();
         CHalfEdge*    clw_rotate_about_target();
@@ -62,6 +78,7 @@ class CHalfEdge
             return m_string;
         };
         
+        
     private:
 
         CEdge*            m_edge;
@@ -69,6 +86,8 @@ class CHalfEdge
         CVertex*          m_vertex;     //target vertex
         CHalfEdge*     m_prev;
         CHalfEdge*      m_next;
+		bool m_alive;
+        bool m_updated;
         std::string          m_string;
         
 };

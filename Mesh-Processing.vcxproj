@@ -23,6 +23,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MeshProcessing</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>Mesh-Processing</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -142,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="helper.hpp" />
     <ClInclude Include="lib\mesh_library\Geometry\Point.h" />
     <ClInclude Include="lib\mesh_library\Geometry\Point2.H" />
     <ClInclude Include="lib\mesh_library\Mesh\Boundary.h" />
@@ -154,6 +156,8 @@
     <ClInclude Include="lib\mesh_library\Parser\parser.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FillHole.hpp" />
+    <ClCompile Include="helper.cpp" />
     <ClCompile Include="lib\mesh_library\Mesh\Boundary.cpp" />
     <ClCompile Include="lib\mesh_library\Mesh\Edge.cpp" />
     <ClCompile Include="lib\mesh_library\Mesh\HalfEdge.cpp" />
@@ -161,6 +165,7 @@
     <ClCompile Include="lib\mesh_library\Mesh\Vertex.cpp" />
     <ClCompile Include="lib\mesh_library\Parser\token.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Subdivision.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

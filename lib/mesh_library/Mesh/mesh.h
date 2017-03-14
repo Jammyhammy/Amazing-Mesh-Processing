@@ -5,10 +5,10 @@
 
 #include <assert.h>
 #include <cmath>
-#include "Edge.h"
-#include "Face.h"
-#include "HalfEdge.h"
-#include "Vertex.h"
+#include "../Mesh/Edge.h"
+#include "../Mesh/Face.h"
+#include "../Mesh/HalfEdge.h"
+#include "../Mesh/Vertex.h"
 #include "../Geometry/Point.h"
 #include <list>
 #include <map>
@@ -52,6 +52,10 @@ class CMesh
         int  numVertices();
         int  numEdges();
         int  numFaces();
+
+		//max_vertex_id, max_face_id
+		int max_vertex_id();
+		int max_face_id();
 
         //is boundary
         bool    isBoundary(tVertex  v);
@@ -116,6 +120,15 @@ class CMesh
         std::list<tVertex> & vertices() {
             return m_verts;
         };
+		std::map<int, tVertex> & vmap() {
+			return m_map_vert;
+		};
+		std::map<CEdgeKey, tEdge> & emap() {
+			return m_map_edge;
+		};
+		std::map<int, tFace> & fmap() {
+			return m_map_face;
+		};
 
     protected:
 
@@ -129,8 +142,8 @@ class CMesh
         std::map<int, tFace>                        m_map_face;
         std::map<CEdgeKey, tEdge>                 m_map_edge;
 
-    protected:
-
+    //protected:
+	public:
         tVertex   createVertex(int id = 0);
         tEdge     createEdge(tVertex v1, tVertex v2);
         tFace     createFace(CVertex* v[], int id);      //create a triangle
