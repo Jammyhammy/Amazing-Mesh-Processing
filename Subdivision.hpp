@@ -17,18 +17,6 @@ using namespace MeshLib;
 
 // check http://www.ltcconline.net/greenl/courses/107/vectors/dotcros.htm for reference of vector operations
 
-double inline roundDouble(double v) {
-	v *= 10000.0;
-	if (v < 0) return ceil(v - 0.5) / 10000.0;
-	return floor(v + 0.5) / 10000.0;
-}
-
-CPoint* roundPoint(CPoint* cp) {
-
-	auto npx = roundDouble(cp->get_x());
-	auto npy = roundDouble(cp->get_y());
-	auto npz = roundDouble(cp->get_z());
-}
 
 void inline getAdjacentVertices(CVertex *v, std::vector<CVertex*> *adj_v)
 {
@@ -351,15 +339,6 @@ void subdivide_loop(std::string meshfile, std::string outmeshfile)
 					yt += beta * adj_verts[j]->point()[1];
 					zt += beta * adj_verts[j]->point()[2];
 				}
-				double npx = (xt + 5.0 * item->point()[0]) / 8.0;
-				double npy = (yt + 5.0 * item->point()[1]) / 8.0;
-				double npz = (zt + 5.0 * item->point()[2]) / 8.0;
-
-				npx = roundDouble(npx);
-				npy = roundDouble(npy);
-				npz = roundDouble(npz);
-				
-
 				CPoint* np = new CPoint(
 					(xt + 5.0 * item->point()[0]) / 8.0,
 					(yt + 5.0 * item->point()[1]) / 8.0,
