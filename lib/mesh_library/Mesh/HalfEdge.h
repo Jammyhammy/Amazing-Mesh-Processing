@@ -27,6 +27,17 @@ class CHalfEdge
             m_updated = false;
         };
 
+        CHalfEdge(int id) {
+            m_edge = NULL;
+            m_vertex = NULL;
+            m_prev = NULL;
+            m_next = NULL;
+            m_face = NULL;
+			m_alive = true;
+            m_updated = false;
+            m_id = id;
+        };        
+
         ~CHalfEdge() { };
 
         CEdge*&            edge()    {
@@ -77,6 +88,10 @@ class CHalfEdge
         std::string& string() {
             return m_string;
         };
+
+        int id() {
+            return m_id;
+        };        
         
         
     private:
@@ -89,6 +104,7 @@ class CHalfEdge
 		bool m_alive;
         bool m_updated;
         std::string          m_string;
+        int m_id;
         
 };
 

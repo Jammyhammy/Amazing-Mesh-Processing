@@ -70,11 +70,11 @@ void subdivide_loop(std::string meshfile, std::string outmeshfile)
 {
 
 	CMesh mesh;
+	CMesh oldmesh;
 	CMesh mesh2;
-	mesh2.write_m("testempty.m");
-
 	
 	mesh.read_m(meshfile.c_str());		//read into mesh (triangle mesh with format .m)
+	oldmesh.read_m(meshfile.c_str());
 	std::list<CVertex*> mvs = mesh.vertices();
 	std::list<CFace*> mfs = mesh.faces();
 	std::list<CEdge*> mes = mesh.edges();
@@ -88,7 +88,7 @@ void subdivide_loop(std::string meshfile, std::string outmeshfile)
 	std::vector<CEdge*> edges{ std::begin(mes), std::end(mes) };
 
 	std::vector<CVertex*> newvtx;
-	std::vector<CVertex*> newnewvtx;
+
 
 	std::vector<std::pair<CVertex*, CVertex*>> vtxpair;
 
@@ -148,7 +148,9 @@ void subdivide_loop(std::string meshfile, std::string outmeshfile)
 			//CVertex* nv2 = mesh2.createVertex(mesh2.max_vertex_id() + 1);
 
 			CPoint* np = new CPoint(
-				3.0 * (v0->point()[0] + v1->point()[0]) / 8.0 + (vtxtem1->point()[0] + vtxtem2->point()[0]) / 8.0,
+				3.0 * 
+				(v0->point()[0] + v1->point()[0]) / 8.0 
+				+ (vtxtem1->point()[0] + vtxtem2->point()[0]) / 8.0,
 				3.0 * (v0->point()[1] + v1->point()[1]) / 8.0 + (vtxtem1->point()[1] + vtxtem2->point()[1]) / 8.0,
 				3.0 * (v0->point()[2] + v1->point()[2]) / 8.0 + (vtxtem1->point()[2] + vtxtem2->point()[2]) / 8.0
 			);
@@ -295,14 +297,20 @@ void subdivide_loop(std::string meshfile, std::string outmeshfile)
 			//mesh2.write_m(outmeshfile.c_str());
 		}
 	}
-
+	std::list<CVertex*> oldmvs = oldmesh.vertices();
+	std::vector<CVertex*> oldverts{ std::begin(oldmvs), std::end(oldmvs) };
+	std::vector<CVertex*> oldvtx;
 	//mesh2.write_m("testing.m");
+	for (std::vector<CVertex*>::iterator it = oldverts.begin(); it != oldverts.end(); ++it) {
+		CVertex* item = *it;
+		oldvtx.push_back(item);
+	}
 
 	//Update vertices
-	for (std::vector<CVertex*>::iterator it = newvtx.begin(); it != newvtx.end(); ++it) {
-		CVertex* item = *it;
+	for (int i = 0; i < oldvtx.size(); i++) {
+		CVertex* item = oldvtx.at(i);
 		std::vector<CVertex*> adj_verts;
-		getAdjacentVertices(*it, &adj_verts);
+		getAdjacentVertices(item, &adj_verts);
 		if (item->boundary()) {
 			CPoint* np = new CPoint(
 				(adj_verts[0]->point()[0] + adj_verts[1]->point()[0] + 6.0 * item->point()[0] ) / 8.0,
@@ -315,39 +323,60 @@ void subdivide_loop(std::string meshfile, std::string outmeshfile)
 			int n = adj_verts.size();
 			if (n == 3) {
 				CPoint* np = new CPoint(
-					3.0 * (adj_verts[0]->point()[0]
+					(3.0 * (adj_verts[0]->point()[0]
 							+ adj_verts[1]->point()[0]
-							+ adj_verts[2]->point()[0]
-							+ 7.0 * item->point()[0]) / 16.0,
-					3.0 * (adj_verts[0]->point()[1]
-						+ adj_verts[1]->point()[1]
-						+ adj_verts[2]->point()[1]
-						+ 7.0 * item->point()[1]) / 16.0,
-					3.0 * (adj_verts[0]->point()[2]
+							+ adj_verts[2]->point()[0] 
+							)
+						+ (7.0 * item->point()[0])
+					) 
+					/ 16.0,
+					(3.0 * (adj_verts[0]->point()[1]
+							+ adj_verts[1]->point()[1]
+							+ adj_verts[2]->point()[1] 
+							)
+						+ (7.0 * item->point()[1])
+					) 
+					/ 16.0,
+					(3.0 * (adj_verts[0]->point()[2]
 						+ adj_verts[1]->point()[2]
 						+ adj_verts[2]->point()[2]
-						+ 7.0 * item->point()[2]) / 16.0
+						)
+						+ (7.0 * item->point()[2])
+						)
+					/ 16.0
 				);
 				item->set_point(*np);
 
 			}
 			else if (n > 3) {
-				float beta = 3.0 / (8.0 *n);
-				float xt, yt, zt = yt = xt = 0.0;
+				if (n > 8) {
+					auto test = "whoa";
+				}
+				float beta = 3.0 / (8.0 *(double)n);
+				float xt = 0.0;
+				float yt = 0.0;
+				float zt = 0.0;
 				for (int j = 0; j < n; ++j) {
 					xt += beta * adj_verts[j]->point()[0];
 					yt += beta * adj_verts[j]->point()[1];
 					zt += beta * adj_verts[j]->point()[2];
 				}
+				
+
 				CPoint* np = new CPoint(
-					(xt + 5.0 * item->point()[0]) / 8.0,
-					(yt + 5.0 * item->point()[1]) / 8.0,
-					(zt + 5.0 * item->point()[2]) / 8.0
+					xt + 5.0 * item->point()[0] / 8.0,
+					yt + 5.0 * item->point()[1] / 8.0,
+					zt + 5.0 * item->point()[2] / 8.0
 				);
 				
 				item->set_point(*np);
 			}
 		}
+	}
+
+	for (int i = 0; i < oldvtx.size(); i++) {
+		CVertex* item = oldvtx.at(i);
+		newvtx.at(i) = item;
 	}
 
 	// remove old faces, and then generate a completely new mesh.

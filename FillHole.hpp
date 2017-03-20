@@ -77,18 +77,18 @@ void inline getBoundaryVertices(vector<CVertex*> *v, CMesh *mesh)
 	}
 }
 
-void inline getHole(std::vector<CVertex*> *hole, std::vector<CVertex*> *v) {
+void inline findHole(std::vector<CVertex*> *h, std::vector<CVertex*> *v) {
 	while (v->size()) {
 		CVertex* bv = v->at(0);
-		int sourceid = bv->id();
+		int sid = bv->id();
 		CHalfEdge *he = bv->halfedge();
-		hole->push_back(bv);
+		h->push_back(bv);
 		bv = bv->most_ccw_in_halfedge()->source();
-		while (bv->id() != sourceid) {
-			hole->push_back(bv);
+		while (bv->id() != sid) {
+			h->push_back(bv);
 			bv = bv->most_ccw_in_halfedge()->source();
 		}
-		for (std::vector<CVertex*>::iterator it = hole->begin(); it != hole->end(); ++it) {
+		for (std::vector<CVertex*>::iterator it = h->begin(); it != h->end(); ++it) {
 			CVertex* item = *it;
 			std::vector<CVertex*>::iterator res = std::find(v->begin(), v->end(), item);
 			if (res != v->end())
@@ -105,7 +105,9 @@ void inline calcMinWeight(int i, int k, double *weight, std::vector<CVertex*> *h
 	CVertex* v[3];
 	for (int m = i + 1; m < k; m++) {
 		double tmp = 0;
+
 		tmp += weight[i*num + m];
+
 		tmp += weight[m*num + k];
 		v[0] = hole->at(i);
 		v[1] = hole->at(m);
@@ -121,9 +123,11 @@ void inline calcMinWeight(int i, int k, double *weight, std::vector<CVertex*> *h
 }
 
 CPoint inline vertexNormal(CVertex* v0, CVertex* v1, CVertex* v2) {
-	auto normal = (v1->point() - v0->point()) ^ (v2->point() - v1->point());
+	auto zomg = (v1->point() - v0->point());
+	auto zomg2 = (v2->point() - v1->point());
+	auto normal = zomg ^ zomg2;
 	auto normalized = normal / normal.norm();
-	return normal;
+	return normalized;
 }
 
 CPoint inline pointNormal(CPoint* v0, CPoint* v1, CPoint* v2) {
@@ -228,7 +232,7 @@ bool inline legalcreateface(CFace* f) {
 	return true;
 }
 
-void inline trace(int i, int k, int *index, std::vector<CVertex*> *hole, int bid, CMesh *mesh) {
+void inline triangulate(int i, int k, int *index, double *weight, std::vector<CVertex*> *hole, int bid, CMesh *mesh) {
 	static int cnt = 0;
 	CVertex* v[3];
 	int num = hole->size();
@@ -241,7 +245,9 @@ void inline trace(int i, int k, int *index, std::vector<CVertex*> *hole, int bid
 	}
 	else {
 		int id = index[i*num + k];
-		if (id != i + 1) trace(i, id, index, hole, bid, mesh);
+		double w = weight[i* num + k];
+
+		if (id != i + 1) triangulate(i, id, index, weight, hole, bid, mesh);
 		v[0] = hole->at(i);
 		v[1] = hole->at(id);
 		v[2] = hole->at(k);
@@ -249,60 +255,99 @@ void inline trace(int i, int k, int *index, std::vector<CVertex*> *hole, int bid
 		auto vyes1 = mesh->idVertex(vtest->id());
 		auto vyes2 = vyes1->halfedge()->he_next()->target();
 		auto vyes3 = vyes2->halfedge()->he_next()->target();
+		//auto vyes1 = mesh->idVertex(vtest->id());
+		//auto vyes2 = vyes1->halfedge()->he_next()->target();
+		//auto vyes3 = vyes1->halfedge()->he_next()->he_next()->target();
+
+
 		auto vc = vertexNormal(vyes1, vyes2, vyes3);
+
+		//auto vc = vertexNormal(v1, v2, v3);
 		//auto vcn = vc / vc.norm();
 		auto pc = vertexNormal(v[0], v[1], v[2]);
 		//auto pcn = pc / pc.norm();
 		auto pcv = v[2]->point() + v[0]->point();
 		auto ndv = pcv * pc;
 		//auto ndvn = pcv * pcn;
-		auto vpc = vertexNormal(vtest, v[1], v[2]);
-		//auto vpcn = vpc / vpc.norm();
-		auto vpcv = v[2]->point() + v[0]->point();
-		auto vndv = vpcv * vpc;
+		//auto vpc = vertexNormal(vtest, v[1], v[2]);
+		////auto vpcn = vpc / vpc.norm();
+		//auto vpcv = v[2]->point() + v[0]->point();
+		//auto vndv = vpcv * vpc;
 		//auto vndvn = vpcv * vpcn;
 		auto testdot = vc * pc;
-		auto testv = pointNormal(&vpcv, &(v[1]->point()), &(v[2]->point()));
+		//auto testv = pointNormal(&vpcv, &(v[1]->point()), &(v[2]->point()));
 		//auto moretest = vtes
 		auto testangles = angleVectors(&vc, &pc);
 		if (testangles < 1.32 && ndv > 0.0) {
+			if (bid + cnt == 69199)
+				auto test2 = "wa";
 			mesh->createFace(v, bid + cnt);
 		}
-		if (testdot < 0.0) {
-			auto test = "test";
-		}
+		//if (testdot < 0.0) {
+		//	auto test = "test";
+		//}
 
-		if (ndv < 0.0)
-		{
-			auto test = "test";
-		}
-		if (bid + cnt == 69198 || bid + cnt == 69199 || bid + cnt == 6001)
-		{
-			//auto testface = mesh->createFace(v, bid + cnt);
-			//auto legal = legalcreateface(testface);
-			auto test = "test";
-		}
-		else
-		{
-			//auto testface = mesh->createFace(v, bid + cnt);
-			//auto legal = legalcreateface(testface);
-			auto test = "test";
+		//if (ndv < 0.0)
+		//{
+		//	auto test = "test";
+		//}
+		//if (bid + cnt == 69198 || bid + cnt == 69199 || bid + cnt == 6001 || bid + cnt == 6002 || bid + cnt == 6003 || bid + cnt == 6004 
+		//	|| bid + cnt >= 6005)
+		//{
+		//	CVertex* dv[3];
+		//	auto test = "test";
+		//	testangles = angleVectors(&vc, &pc);
+		//	testdot = vc * pc;
+		//	//if (bid + cnt == 6001) {
+		//	dv[0] = v[0];
+		//	dv[1] = v[2];
+		//	dv[2] = v[1];
+		//	//}
+		//	pc = vertexNormal(dv[0], dv[1], dv[2]);
+		//	testangles = angleVectors(&vc, &pc);
+		//	testdot = vc * pc;
+		//	if (testdot >= 0.0) {
+		//		//if (bid + cnt == 6006) 
+		//		//	triangulate(i, id, index, weight, hole, bid, mesh);
+		//		//	//auto test4 = "test";
+		//		//else {
+		//		//	mesh->createFace(dv, bid + cnt);
+		//		//}
+		//	}
+		//	else {
+		//		CVertex* dvv[3];
+		//		dv[0] = v[1];
+		//		dv[1] = v[2];
+		//		dv[2] = v[0];
+		//		if (bid + cnt == 6007 || bid + cnt == 6006) 
+		//			auto test4 = "test";
+		//		pc = vertexNormal(dv[0], dv[1], dv[2]);
+		//		testangles = angleVectors(&vc, &pc);
+		//		testdot = vc * pc;
+		//		auto test3 = "test";
+		//		//if (testdot >= 0.0) {
+		//		//	mesh->createFace(dv, bid + cnt);
+		//		//}
 
-		}
-		//mesh->createFace(v, bid + cnt);
-		//auto testface = mesh->createFace(v, bid + cnt);
-		//auto legal = legalcreateface(testface);
+		//	}
+
+
+		//	auto test2 = "test";
+
+		//	//auto testface = mesh->createFace(v, bid + cnt);
+		//	//auto legal = legalcreateface(testface);
+		//}
 
 		cnt++;
 
 		if (id != k - 1)
-			trace(id, k, index, hole, bid, mesh);
+			triangulate(id, k, index, weight, hole, bid, mesh);
 	}
 }
 
-void inline addFace(int *index, std::vector<CVertex*> *hole, CMesh *mesh) {
+void inline addFace(int *index, double *w, std::vector<CVertex*> *hole, CMesh *mesh) {
 	int base_id = mesh->max_face_id() + 1;
-	trace(0, hole->size() - 1, index, hole, base_id, mesh);
+	triangulate(0, hole->size() - 1, index, w, hole, base_id, mesh);
 }
 
 void inline faceFillHole(std::vector<CVertex*> *hole, CMesh *mesh) {
@@ -340,7 +385,7 @@ void inline faceFillHole(std::vector<CVertex*> *hole, CMesh *mesh) {
 			calcMinWeight(i, k, w, hole, mesh, index);
 		}
 	}
-	addFace(index, hole, mesh);
+	addFace(index, w, hole, mesh);
 	free(w);
 	free(index);
 	index = NULL;
@@ -386,7 +431,7 @@ void inline boundary_edge_update(CMesh *mesh)
 		he[1] = edge->halfedge(1);
 
 		assert(he[0] != NULL);
-
+		
 		if (he[1] != NULL)
 		{
 			//assert(he[0]->target() == he[1]->source() && he[0]->source() == he[1]->target());
@@ -410,24 +455,70 @@ void inline boundary_edge_update(CMesh *mesh)
 
 	}
 }
-void inline holeFill(CMesh* mesh) {
+
+void ccw_halfedge_update(CMesh *mesh, bool* loadAgain)
+{
+	//Arrange the boundary half_edge of boundary vertices, to make its halfedge
+	//to be the most ccw in half_edge
+	std::list<CVertex*> m_verts = mesh->vertices();
+
+
+	for (std::list<CVertex*>::iterator viter = m_verts.begin(); viter != m_verts.end(); ++viter)
+	{
+		CVertex *v = *viter;
+		if (!v->boundary())
+			continue;
+
+		CHalfEdge *he = v->halfedge();
+		int max_tries = 25;
+
+		while (he->he_sym() != NULL)
+		{
+			if (max_tries <= 0) {
+				he->vertex()->boundary() = true;
+				he->he_prev()->vertex()->boundary() = true;
+				*loadAgain = false;
+				break;
+			}
+			he = he->ccw_rotate_about_target();
+			max_tries--;
+		}
+		v->halfedge() = he;
+	}
+}
+
+void inline holeFill(CMesh* mesh, std::string outmeshfile, bool* loadAgain) {
 	std::vector<CVertex*> boundaryVertex;
 	getBoundaryVertices(&boundaryVertex, mesh);
 	while (!boundaryVertex.empty()) {
 		std::vector<CVertex*> hole;
-		getHole(&hole, &boundaryVertex);
+		findHole(&hole, &boundaryVertex);
 		faceFillHole(&hole, mesh);
 	}
 	boundary_edge_update(mesh);
+	ccw_halfedge_update(mesh, loadAgain);
 }
 
 
 void fillHoles(std::string meshfile, std::string outmeshfile)
 {
 	CMesh mesh;
+	bool loadAgain = true;
 	mesh.read_m(meshfile.c_str());
-	holeFill(&mesh);
+	holeFill(&mesh, outmeshfile, &loadAgain);
 	mesh.write_m(outmeshfile.c_str());
+	for (int i = 0; i < 4; i++) {
+		if (!loadAgain) break;
+		CMesh mesh2;
+		std::vector<CVertex*> boundaryVertex;
+		mesh2.read_m(outmeshfile.c_str());
+		getBoundaryVertices(&boundaryVertex, &mesh2);
+		if (!boundaryVertex.empty())
+		{
+			holeFill(&mesh2, outmeshfile, &loadAgain);
+			mesh2.write_m(outmeshfile.c_str());
+		}
+	}
 }
 
 #endif

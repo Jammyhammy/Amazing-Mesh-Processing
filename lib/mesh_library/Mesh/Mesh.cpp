@@ -985,11 +985,12 @@ CMesh::tFace CMesh::createFace(CVertex* v[] , int id)
 
     for(int i = 0; i < 3; i ++)
     {
-        hes[i] = new CHalfEdge;
+        hes[i] = new CHalfEdge(m_he_count);
         assert(hes[i]);
         CVertex* vert =  v[i];
         hes[i]->vertex() = vert;
         vert->halfedge() = hes[i];
+        m_he_count++;
     }
 
     //linking to each other

@@ -32,7 +32,9 @@ class CMesh
         typedef CMesh*     tMesh;
 
         //constructor and destructor
-        CMesh() {};
+        CMesh() {
+			m_he_count = 0;
+		};
         ~CMesh();
 
         //copy operator
@@ -130,6 +132,10 @@ class CMesh
 			return m_map_face;
 		};
 
+        int he_count() {
+            return m_he_count;
+        };        
+
     protected:
 
         std::list<tEdge>                          m_edges;
@@ -141,6 +147,7 @@ class CMesh
         std::map<int, tVertex>                    m_map_vert;
         std::map<int, tFace>                        m_map_face;
         std::map<CEdgeKey, tEdge>                 m_map_edge;
+        int m_he_count;
 
     //protected:
 	public:
