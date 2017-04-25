@@ -193,14 +193,13 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 		assert(true);
 	}
 
-	// now finally solve!
 	Eigen::VectorXd x(N);
 	Eigen::VectorXd y(N);
 	x = solver.solve(bx);
 	y = solver.solve(by);
 
 	std::vector<CPoint2> uvpoints;
-	// output uvs.
+
 	for (int i = 0; i < N; i++) {
 		outUvs->push_back(x[i]);
 		outUvs->push_back(y[i]);
