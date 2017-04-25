@@ -24,9 +24,7 @@ using std::set;
 using namespace MeshLib;
 using namespace Eigen;
 
-//Computes the harmonic weight for the edge.
 float HarmonicWeight(CEdge* e) {
-	// length of edge shared by the two triangles.
 	float c = e->GetLength();
 	CHalfEdge* he = e->halfedge(0);
 
@@ -48,7 +46,6 @@ float HarmonicWeight(CEdge* e) {
 	auto b2_p2 = he->he_next()->he_next()->he_next()->vertex()->point();
 	float b2 = CPoint::distance(b2_p1, b2_p2);
 
-	// use the cosine law to compute cos(u) and cos(v)
 	float cos_u = (b1*b1 + a1*a1 - c*c) / (2.0 * b1 * a1);
 	float cos_v = (b2*b2 + a2*a2 - c*c) / (2.0 *b2 *a2);
 
@@ -64,7 +61,6 @@ float HarmonicWeight(CEdge* e) {
 
 void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 
-	// Setup half edge mesh.
 
 	std::list<CVertex*> mvs = mesh->vertices();
 	std::list<CFace*> mfs = mesh->faces();
@@ -75,15 +71,9 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 	std::vector<CFace*> faces {std::begin(mfs), std::end(mfs)};
 	std::vector<CEdge*> edges { std::begin(mes), std::end(mes)};
 
-	// To now find the uv coordinates, we will create a system of
-	// linear equations. The system is formulated with matrices and vectors and then we solve it with Eigen.
-
-	// N is number of variables in the linear system. We want uv coordinates for every vertex
-	// so one variable for every vertex.
 	const int N = verts.size();
 
 
-	// Let us first find the boundary. So let us find the first boundary edge.
 	std::list<CHalfEdge*>::iterator firstBoundary = mesh->EndHalfEdges();
 	std::list<CHalfEdge*>::iterator currentBoundary = mesh->EndHalfEdges();
 
@@ -104,13 +94,10 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 		vertexMap.insert(std::make_pair(vertexMap.size(), item));
 
 	}
-
-	// find the rest of the boundary by iterating over the boundary.
-	// also, keep track of the cumulative edge length over the boundary.
 	std::vector<CHalfEdge*> boundaryEdges;
 	std::vector<CVertex*> boundaryVertices;
 	set<int> boundarySet;
-	vector<float> edgeLengths; // cumulative edge lengths
+	vector<float> edgeLengths; 
 	float totalEdgeLength = 0.0;
 	std::list<CHalfEdge*>::iterator previousBoundary = firstBoundary;
 	currentBoundary = firstBoundary;
@@ -138,43 +125,9 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 		}
 	}
 
-	//for (std::vector<CVertex*>::iterator it = boundaryVertices.begin(); it != boundaryVertices.end(); ++it) {
-	//	CVertex* item = *it;
-	//	
-	//}	
-
-	//if(firstBoundary != mesh->EndHalfEdges()){
-	//	do {
-	//		CHalfEdge* currentItem = *currentBoundary;
-	//		CHalfEdge* previousItem = *previousBoundary;
-	//		boundaryEdges.push_back(currentItem);
-	//		boundaryVertices.push_back(currentItem->vertex());
-	//		boundarySet.insert(currentItem->vertex()->index());
-
-	//		// cumulative edge length of 'currentBoundary->vertex'
-	//		edgeLengths.push_back(totalEdgeLength);
-	//		currentBoundary = mesh->GetNextBoundary(currentBoundary);
-	//		auto bo_p1 = previousItem->vertex()->point();
-	//		auto bo_p2 = currentItem->vertex()->point(); 
-	//		totalEdgeLength += CPoint::distance(bo_p1, bo_p2);
-	//		previousBoundary = currentBoundary;
-	//	} while (currentBoundary != firstBoundary && currentBoundary != previousBoundary);
-	//}
-
-	// Now let us formulate the linear system. We have two systems:
-	// W * x = bx
-	// W * y = by
-	// one system for each of the two uv-coordinates.
 	Eigen::VectorXd bx(N);
 	Eigen::VectorXd by(N);
 
-
-	// Here's bx and by:
-	// for non-boundary vertices, we have
-	// (bx[i], by[i]) = (0,0)
-	// for boundary vertices, we project them onto a circle.
-	// so for boundary vertices we have:
-	// (bx[i], by[i]) = (cos(theta),sin(theta))
 	for(int i =0; i<N;i++)
 	{
 		bx[i] = 0.0f;
@@ -188,7 +141,6 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 		by[v->index()] = sin(theta);
 	}
 
-	// W is very sparse, so much can be saved by using a sparse matrix.
 	typedef Eigen::Triplet<double> Triplet;
 	typedef Eigen::SparseMatrix<double> SparseMatrix;
 	SparseMatrix W(N, N);
@@ -197,14 +149,8 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 	vector<double> diag; // diagonal values in W.
 	diag.resize(N, 0);
 
-	// Note that in order to construct the matrix, I do not use the exact same approach
-	// as described in the article. Using the below approach, we only have to compute the
-	// harmonic weights once. But the resulting matrix will be the same matrix that was
-	// described in the article.
 	for (std::vector<CEdge*>::iterator it = edges.begin(); it != edges.end(); ++it) {
-		// The boundary vertices are fixed(they are projected on a circle),
-		// so we do not need to compute any weights of the boundary edges.
-		// So the boundary edges contribute very little to the final linear system.
+	
 		CEdge* item = *it;
 		if (mesh->isBoundary(item)) {
 			continue;
@@ -217,16 +163,6 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 
 		float weight = HarmonicWeight(item);
 
-		// if we instead set the weight to one, then we get uniform weights. But that sucks, though.
-		//        weight = 1.0;
-
-		// We set the weights for non-boundary edges.
-		// Note that the conditionals are very important!
-		// If i is some boundary vertex, then we need to make sure
-		// that in row i, (i,i) is one, and all other elements are zero.
-		// Because in the linear system we should have
-		// 1.0 * x[i] = bx[i]
-		// (so also below for more explanations)
 
 		if (boundarySet.count(i0) == 0) {
 			triplets.push_back(Triplet(i0, i1, weight));
@@ -241,23 +177,16 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 
 	for (int i = 0; i < diag.size(); i++) {
 		if(boundarySet.count(i) > 0) {
-			// for boundary vertices, diagonal is one.
-			// The result of this will be that the i:th equation(that is, row i) in the linear system becomes
-			// 1.0 * x[i] = bx[i]
-			// which is correct. Because the boundary vertices are fixed,
-			// and thus we already know the value of x[i].
+	
 			triplets.push_back(Triplet(i, i, 1.0));
 		}
 		else {
-			// for non-boundary vertices, the diagonal is the NEGATIVE sum
-			// of all non-diagonal elements in row i.
+
 			triplets.push_back(Triplet(i, i, diag[i]));
 		}
 	}
-	// construct sparse matrix.
 	W.setFromTriplets(triplets.begin(), triplets.end());
 	Eigen::SparseLU<SparseMatrix > solver;
-	//Eigen::FullPivHouseholderQR<
 	solver.compute(W);
 	if (solver.info() != Eigen::Success) {
 		printf("ERROR: found no decomposition of sparse matrix");
