@@ -14,16 +14,18 @@ std::string const outmeshfile = "smileuv.m";
 
 int main(int argc, char * argv[])
 {
-	//if (std::string(argv[1]) == "-subdivision") {
-	//	subdivide_loop(argv[2], argv[3]);
-	//	//subdivide_loop(meshfile, outmeshfile);
-	//}
-	//else if (std::string(argv[1]) == "-fillhole")
-	//{
-	//	//fillHoles(meshfile, outmeshfile);
-	//	fillHoles(argv[2], argv[3]);
+	if (std::string(argv[1]) == "-subdivision") {
+		subdivide_loop(argv[2], argv[3]);
+		//subdivide_loop(meshfile, outmeshfile);
+	}
+	else if (std::string(argv[1]) == "-fillhole")
+	{
+		//fillHoles(meshfile, outmeshfile);
+		fillHoles(argv[2], argv[3]);
 
-	//}
-	Parameterization(meshfile, outmeshfile);
+	}
+	else if (std::string(argv[1]) == "-parameterization") {
+		Parameterization(argv[2], argv[3]);
+	}
 	return 0;
 }
