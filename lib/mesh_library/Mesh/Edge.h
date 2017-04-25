@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <cmath>
 #include <string>
+#include "../Geometry/Point.h"
 
 
 namespace MeshLib {
@@ -45,7 +46,8 @@ class CEdge
         std::string& string() {
             return m_string;
         };
-        
+
+        double GetLength();
 
     private:
 

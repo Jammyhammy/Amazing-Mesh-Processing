@@ -137,6 +137,17 @@ class CPoint {
 			return v[2];
 		}
 
+		static double length(const CPoint& a) {
+			return sqrt(dot(a, a));
+		}
+
+		static double dot(const CPoint& a, const CPoint& b) {
+			return a.v[0] * b.v[0] + a.v[1] * b.v[1] + a.v[2] * b.v[2];
+		}
+
+		static double distance(const CPoint& a, const CPoint& b) {
+			return length(a - b);
+		}
 
     protected:
         double v[3];

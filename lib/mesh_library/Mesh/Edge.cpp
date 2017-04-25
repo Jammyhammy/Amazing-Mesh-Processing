@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "Edge.h"
+#include "HalfEdge.h"
 #include "Vertex.h"
 
 using namespace MeshLib;
@@ -37,4 +38,12 @@ bool CEdgeKey::operator==(const CEdgeKey& key) const
     if(m_verts[1]->id() != key.m_verts[1]->id()) return false;
 
     return true;
+}
+
+double MeshLib::CEdge::GetLength()
+{
+	auto p1 = m_halfedge[0]->vertex()->point();
+	auto p2 = m_halfedge[1]->vertex()->point();
+	auto v = CPoint::distance(p1, p2);
+	return v;
 }

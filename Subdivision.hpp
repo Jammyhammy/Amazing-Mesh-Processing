@@ -8,7 +8,6 @@
 #include <list>
 #include <string>
 
-
 #include "./lib/Mesh_Library/Mesh/mesh.h"
 #include "./lib/Mesh_Library/Mesh/iterators.h"
 #include "./lib/mesh_library/Geometry/Point.h"

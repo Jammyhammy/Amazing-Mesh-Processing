@@ -19,6 +19,12 @@ class CVertex
             m_boundary = false;
 			m_alive = true;
         };
+        CVertex(int i) {
+            m_halfedge = NULL;
+            m_boundary = false;
+			m_alive = true;
+            m_index = i;
+        };    
         ~CVertex() {};
 
         CPoint& point()    {
@@ -49,6 +55,10 @@ class CVertex
         int&   id() {
             return m_id;
         };
+
+        int&   index() {
+            return m_index;
+        };        
         bool& boundary() {
             return m_boundary;
         };
@@ -59,10 +69,19 @@ class CVertex
 		void set_id(int id){
 			m_id = id;
 		}
-
+		void set_index(int i){
+			m_index = i;
+		}
 		void set_point(CPoint p)
 		{
 			m_point = p;
+		}
+		void set_uv(CPoint2 p) {
+			m_uv = p;
+		}
+
+		void set_string(std::string s) {
+			m_string = s;
 		}
 
 		void set_point_update(CPoint update)
@@ -88,6 +107,7 @@ class CVertex
 
     private:
         int  m_id ;
+        int m_index;
 
         CPoint m_point;
         CPoint m_normal;

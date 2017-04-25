@@ -65,7 +65,14 @@ bool CMesh::isBoundary(CMesh::tEdge  e)
 
 bool CMesh::isBoundary(CMesh::tHalfEdge  he)
 {
-    if(he->he_sym() == NULL) return true;
+	if (he->he_sym() == NULL) return true;
+	return false;
+};
+
+bool CMesh::isBoundary(HalfEdgeIter he)
+{
+	CHalfEdge* it = *he;
+    if(it->he_sym() == NULL) return true;
     return false;
 };
 
@@ -190,6 +197,34 @@ CMesh::tHalfEdge CMesh::faceMostClwHalfEdge(CMesh::tFace  face)
 {
     return face->halfedge()->he_next();
 };
+
+CMesh::HalfEdgeIter CMesh::GetNextBoundary(HalfEdgeIter iter) {
+	CHalfEdge* he = *iter;
+    CVertex* to = he->he_next()->vertex();
+    CHalfEdge* halfEdge = to->halfedge();
+
+    CHalfEdge* first = halfEdge;
+			
+	auto checkThis = std::find(m_halfedges.begin(), m_halfedges.end(), halfEdge);
+
+    do {
+		checkThis = std::find(m_halfedges.begin(), m_halfedges.end(), halfEdge);
+        if(isBoundary(checkThis)) {
+            return checkThis;
+        }
+        halfEdge = halfEdge->he_sym()->he_next();
+		printf("%u\n", halfEdge->id());
+
+    } while (halfEdge != first);
+
+	for (std::list<tHalfEdge>::iterator hit = iter; hit != m_halfedges.end(); hit++) {
+		if (isBoundary(hit)) {
+			return checkThis;
+		}
+	}
+
+	printf("Oops I halted in CMesh::tHalfEdge CMesh::GetNextBoundary at line 206 because there was no boundary halfedge.");
+}
 
 
 CMesh::~CMesh()
@@ -816,7 +851,7 @@ bool Solid::import( const char * filename )
 
 CMesh::tVertex CMesh::createVertex(int id)
 {
-    tVertex v = new CVertex();
+    tVertex v = new CVertex(m_verts.size());
     assert(v != NULL);
     v->id() = id;
     m_verts.push_back(v);
@@ -990,6 +1025,8 @@ CMesh::tFace CMesh::createFace(CVertex* v[] , int id)
         CVertex* vert =  v[i];
         hes[i]->vertex() = vert;
         vert->halfedge() = hes[i];
+        m_halfedges.push_back(hes[i]);
+        m_map_halfedge.insert(std::pair<int, tHalfEdge>(m_he_count, hes[i]));
         m_he_count++;
     }
 

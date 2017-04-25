@@ -30,6 +30,8 @@ class CMesh
         typedef CEdge*      tEdge;
         typedef CFace*      tFace;
         typedef CMesh*     tMesh;
+		typedef std::list<tHalfEdge>::iterator HalfEdgeIter;
+		typedef std::list<tEdge>::iterator EdgeIter;
 
         //constructor and destructor
         CMesh() {
@@ -62,6 +64,7 @@ class CMesh
         //is boundary
         bool    isBoundary(tVertex  v);
         bool    isBoundary(tEdge    e);
+		bool isBoundary(HalfEdgeIter he);
         bool    isBoundary(tHalfEdge  he);
 
         //acess vertex - id
@@ -110,6 +113,10 @@ class CMesh
         tHalfEdge faceNextCcwHalfEdge(tHalfEdge  he);
         tHalfEdge faceNextClwHalfEdge(tHalfEdge  he);
 
+		HalfEdgeIter BeginHalfEdges() { return m_halfedges.begin();}
+		HalfEdgeIter EndHalfEdges() { return m_halfedges.end(); }
+
+		HalfEdgeIter GetNextBoundary(HalfEdgeIter he);
 
         double edgeLength(tEdge e);
 
@@ -122,6 +129,11 @@ class CMesh
         std::list<tVertex> & vertices() {
             return m_verts;
         };
+
+        std::list<tHalfEdge> & halfedges() {
+            return m_halfedges;
+        };
+
 		std::map<int, tVertex> & vmap() {
 			return m_map_vert;
 		};
@@ -131,6 +143,9 @@ class CMesh
 		std::map<int, tFace> & fmap() {
 			return m_map_face;
 		};
+        std::map<int, tHalfEdge> & hemap() {
+            return m_map_halfedge;
+        };
 
         int he_count() {
             return m_he_count;
@@ -141,11 +156,13 @@ class CMesh
         std::list<tEdge>                          m_edges;
         std::list<tVertex>                        m_verts;
         std::list<tFace>                            m_faces;
+        std::list<tHalfEdge>                        m_halfedges;
 
         //maps
 
         std::map<int, tVertex>                    m_map_vert;
         std::map<int, tFace>                        m_map_face;
+        std::map<int, tHalfEdge>                  m_map_halfedge;
         std::map<CEdgeKey, tEdge>                 m_map_edge;
         int m_he_count;
 

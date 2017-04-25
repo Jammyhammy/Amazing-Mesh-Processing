@@ -72,6 +72,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>..\..\..\..\Libs\suitesparse-metis-for-windows\build\install\include\suitesparse;..\..\..\..\Libs\eigen-eigen-67e894c6cd8f\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\..\..\Libs\suitesparse-metis-for-windows\build\install\lib64;..\..\..\..\Libs\suitesparse-metis-for-windows\build\install\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -154,6 +156,7 @@
     <ClInclude Include="lib\mesh_library\Mesh\mesh.h" />
     <ClInclude Include="lib\mesh_library\Mesh\Vertex.h" />
     <ClInclude Include="lib\mesh_library\Parser\parser.h" />
+    <ClInclude Include="Parameterization.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FillHole.hpp" />

@@ -48,6 +48,9 @@
     <ClInclude Include="helper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Parameterization.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\mesh_library\Mesh\Boundary.cpp">

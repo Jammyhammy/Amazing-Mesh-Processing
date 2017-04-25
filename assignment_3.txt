@@ -1,0 +1,4 @@
+Requirement: Please implement one surface parameterization algorithm (convex and harmonic methods are suggested)
+
+Testing model: face.m smile.m
+

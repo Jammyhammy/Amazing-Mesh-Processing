@@ -5,6 +5,8 @@
 #include <cmath>
 #include <string>
 #include "../Mesh/Edge.h"
+#include "../Geometry/Point.h"
+
 
 
 namespace MeshLib {
@@ -91,7 +93,9 @@ class CHalfEdge
 
         int id() {
             return m_id;
-        };        
+        };
+        
+		double GetLength();
         
         
     private:
