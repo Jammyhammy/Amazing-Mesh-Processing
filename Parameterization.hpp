@@ -24,7 +24,9 @@ using std::set;
 using namespace MeshLib;
 using namespace Eigen;
 
+//Computes the harmonic weight for the edge.
 float HarmonicWeight(CEdge* e) {
+	// length of edge shared by the two triangles.
 	float c = e->GetLength();
 	CHalfEdge* he = e->halfedge(0);
 
@@ -53,7 +55,7 @@ float HarmonicWeight(CEdge* e) {
 	float sin_v = sqrt(abs(1.0 - cos_v*cos_v));
 
 	float weight;
-	weight = (cos_u / sin_u + cos_v + sin_v) * 0.5;
+	weight = ((cos_u / sin_u) + (cos_v / sin_v)) * 0.5;
 
 	return weight;
 
@@ -94,6 +96,7 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 		vertexMap.insert(std::make_pair(vertexMap.size(), item));
 
 	}
+
 	std::vector<CHalfEdge*> boundaryEdges;
 	std::vector<CVertex*> boundaryVertices;
 	set<int> boundarySet;
@@ -146,11 +149,10 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 	SparseMatrix W(N, N);
 
 	vector<Triplet> triplets;
-	vector<double> diag; // diagonal values in W.
+	vector<double> diag;
 	diag.resize(N, 0);
 
 	for (std::vector<CEdge*>::iterator it = edges.begin(); it != edges.end(); ++it) {
-	
 		CEdge* item = *it;
 		if (mesh->isBoundary(item)) {
 			continue;
@@ -177,11 +179,10 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 
 	for (int i = 0; i < diag.size(); i++) {
 		if(boundarySet.count(i) > 0) {
-	
+
 			triplets.push_back(Triplet(i, i, 1.0));
 		}
 		else {
-
 			triplets.push_back(Triplet(i, i, diag[i]));
 		}
 	}
@@ -199,7 +200,6 @@ void uvMap(CMesh* mesh, std::vector<float>* outUvs) {
 	y = solver.solve(by);
 
 	std::vector<CPoint2> uvpoints;
-
 	for (int i = 0; i < N; i++) {
 		outUvs->push_back(x[i]);
 		outUvs->push_back(y[i]);
